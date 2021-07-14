@@ -10,24 +10,23 @@ import java.math.*;
 
 /**
  *	<p>
- *	The {@code JsonValue} class represents an immutable JSON value and provides
- *	methods to serialize or deserialize JSON values. It also provides a method
- *	to create a {@code JsonValue} object from ordinary Java objects. Here are
- *	some examples:
+ *	The {@code JsonValue} class represents an immutable JSON value, and
+ *	provides methods to serialize or deserialize JSON values:
  *
  *	<pre>
- *	/&#42; creates a JsonValue object from Java objects &#42;/
+ *	String s = "[1,2,3]";
+ *	JsonValue v = JsonValue.parse(s);
+ *
+ *	System.out.println(v.toString()); // [1,2,3]</pre>
+ *
+ *	<p>
+ *	It is also simple to create a {@code JsonValue} object from ordinary Java
+ *	objects:
+ *
+ *	<pre>
  *	Map map = new HashMap();
  *	map.put("a", 1.0);
- *	JsonValue v1 = JsonValue.valueOf(map);
- *
- *	/&#42; or creates a JsonValue object by deserializing a string &#42;/
- *	String s = "{\"a\":1.0}";
- *	JsonValue v2 = JsonValue.parse(s);
- *
- *	/&#42; serializes a JsonValue object &#42;/
- *	System.out.println(s.equals(v1.toString())); // true
- *	System.out.println(s.equals(v2.toString())); // true</pre>
+ *	JsonValue v = JsonValue.valueOf(map); // {"a":1.0}</pre>
  *
  *	<p>
  *	The {@code JsonValue} class provides a method to select a value, using a
@@ -36,24 +35,20 @@ import java.math.*;
  *	corresponding Java object, such as {@code String} or {@code Number}.
  *
  *	<pre>
- *	Map map = new HashMap();
- *	map.put("a", "b");
- *	List list = new ArrayList();
- *	list.add(map);
- *	list.add(1.0);
+ *	JsonValue v = JsonValue.parse("[1.0,{\"a\":\"b\"}]");
  *
- *	JsonValue v = JsonValue.valueOf(list);
- *	String s = v.get("/0/a").asString(); // using a JSON Pointer
- *	System.out.println(s.equals("b")); // true
- *	Number n = v.get("/1").asNumber();
- *	System.out.println(n.doubleValue() == 1.0); // true</pre>
+ *	String s = v.get("/1/a").asString(); // s.equals("b")
+ *	Number n = v.get("/0").asNumber(); // n.doubleValue() == 1.0</pre>
  *
  *	<p>
  *	The mapping of JSON values to corresponding Java objects or interfaces is:
  *	JSON object to {@code Map}, JSON array to {@code List}, JSON string to
- *	{@code String}, and JSON number to {@code Number}. JSON null and boolean
- *	values are defined as constants: {@code JsonValue.NULL}, {@code
- *	JsonValue.TRUE}, and {@code JsonValue.FALSE}.
+ *	{@code String}, and JSON number to {@code Number}.
+ *
+ *	<p>
+ *	JSON null and boolean values are defined as constants:
+ *	{@code JsonValue.NULL}, {@code JsonValue.TRUE}, and
+ *	{@code JsonValue.FALSE}.
  *
  *	<p>
  *	The {@code JsonValue} class is written in a way that requires parameter
@@ -76,33 +71,23 @@ import java.math.*;
  *	their string representations.
  *
  *	<pre>
- *	/&#42; creates a large number from a BigDecimal object &#42;/
  *	BigDecimal bd = BigDecimal.valueOf(Long.MAX_VALUE);
- *	JsonValue v1 = JsonValue.valueOf(bd.add(bd));
- *	String s = v1.asNumber().toString();
- *	System.out.println(s.equals("18446744073709551614")); // true
- *
- *	/&#42; or creates a large number by deserializing a string &#42;/
- *	JsonValue v2 = JsonValue.parse("18446744073709551614");
- *	System.out.println(v2.asNumber().toString().equals(s)); // true</pre>
+ *	JsonValue v1 = JsonValue.valueOf(bd);
+ *	JsonValue v2 = JsonValue.parse("12345678901234567890");</pre>
  *
  *	<p>
  *	For each {@code JsonValue} object, the value type of the object is
  *	queryable. The Java object type can be queried before retrieving the value
  *	to avoid a possible {@code ClassCastException}. Note that a JSON number is
  *	always mapped to the Java {@code Number} class, regardless of its actual
- *	type (which is always a subclass of {@code Number}).
+ *	type.
  *
  *	<pre>
- *	JsonValue v1 = JsonValue.parse("\"a\"");
- *	if (v1.getType() == String.class) {
- *		System.out.println(v1.asString().equals("a")); // true
- *	}
- *	JsonValue v2 = JsonValue.parse("18446744073709551614"); // a BigDecimal
- *	System.out.println(v2.getType() == Number.class); // true</pre>
+ *	JsonValue v1 = JsonValue.parse("\"a\""); // v1.getType() == String.class
+ *	JsonValue v2 = JsonValue.parse("0"); // v2.getType() == Number.class</pre>
  *
  *	@author Jian-Ting Chen
- *	@version 1.0b1 (2020-07-11)
+ *	@version 1.0rc1 (2021-07-14)
  */
 public class JsonValue {
 
